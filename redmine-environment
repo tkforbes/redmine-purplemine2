@@ -1,0 +1,10 @@
+# This file contains the variables that are required when the
+# Redmine stack is deployed.
+
+# The values may be loaded this way:
+#   export $(grep -v ^# redmine-environment)
+
+# These are the Postgres variables that must be set.
+PG_USER=replace_with_user
+PG_DATABASE=replace_with_database
+PG_PASSWD=replace_with_password
