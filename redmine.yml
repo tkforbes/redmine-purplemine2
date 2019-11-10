@@ -1,0 +1,66 @@
+version: '3.2'
+
+#
+# This file describes an installation of Redmine that uses 
+# a Postgres database for the back-end. It requires that
+# Traefik be executing so that it can direct connections for
+# Redmine.
+
+services:
+
+  redmine:
+    image: redmine:4
+    environment:
+      # REDMINE_DB_POSTGRES is the name of docker service
+      # executing postgres            
+      - 'REDMINE_DB_POSTGRES=postgres'
+      - 'REDMINE_DB_USERNAME=$PG_USER'
+      - 'REDMINE_DB_DATABASE=$PG_DATABASE'
+      - 'REDMINE_DB_PASSWORD=$PG_PASSWD'           
+    volumes:         
+        # see mail settings in this configuration file  
+      - ./redmine-configuration.yml:/usr/src/redmine/config/configuration.yml
+        # PurpleMine2 theme
+      - ./PurpleMine2-master:/usr/src/redmine/public/themes/PurpleMine2-master
+      - type: volume
+        source: redmine-files
+        target: /usr/src/redmine/files
+    networks:
+      - traefik-net
+      - postgres-net
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.backend.loadbalancer.stickiness=true"
+        - "traefik.port=3000"
+        - "traefik.docker.network=traefik-net"
+        - "traefik.frontend.rule=Host:host.domain.com"
+
+  postgres:
+    image: postgres:10
+    environment:
+      - 'POSTGRES_DB=$PG_DATABASE'
+      - 'POSTGRES_USER=$PG_USER'
+      - 'POSTGRES_PASSWORD=$PG_PASSWD'
+    volumes:
+      - type: volume
+        source: redmine-pg-data
+        target: /var/lib/postgresql/data
+    networks:
+      - postgres-net
+    deploy:
+      replicas: 1
+
+volumes:
+  # the Redmine Postgres database
+  redmine-pg-data:
+    driver: local
+
+  # all files stored by Redmine e.g. attachments, documents, images...
+  redmine-files:
+    driver: local  
+
+networks:
+  traefik-net:
+    external: true
+  postgres-net:
