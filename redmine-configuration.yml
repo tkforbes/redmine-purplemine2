@@ -1,0 +1,16 @@
+#
+# This file contains the smtp email settings of an account.
+# Redmine will use this account to sent nofication messages
+# to users of the system.
+
+production:
+  email_delivery:
+    delivery_method: :smtp
+    smtp_settings:
+      enable_starttls_auto: true
+      address: "mail.domain.com" 
+      port: 587
+      domain: "mail.domain.com" 
+      authentication: :plain
+      user_name: "email@domain.com" 
+      password: "a.secure.password.example"
