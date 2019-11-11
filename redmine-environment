@@ -8,3 +8,7 @@
 PG_USER=replace_with_user
 PG_DATABASE=replace_with_database
 PG_PASSWD=replace_with_password
+
+# The value of the frontend rule that traefik will use.
+# This is a DNS A or CNAME record that maps to the site.
+REDMINE_FRONTEND_RULE=redmine.domain.com
