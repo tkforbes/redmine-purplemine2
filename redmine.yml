@@ -1,4 +1,4 @@
-version: '3.2'
+version: '3.3'
 
 #
 # This file describes an installation of Redmine that uses 
@@ -51,6 +51,45 @@ services:
     deploy:
       replicas: 1
 
+
+  # the dirvish service provides for backups
+  dirvish:
+    image: tkforbes/dirvish
+    deploy:
+      # deploy zero backups in non-production environments
+      replicas: 1
+    hostname: dirvish-container
+    environment:
+      TZ: "EST"
+      CRONTIME: "15 03 * * *"
+    configs:
+      - source: dirvish-master-conf
+        target: /etc/dirvish/master.conf
+
+      - source: dirvish-redmine-conf
+        target: /backups/redmine/dirvish/default.conf
+
+    volumes:
+      # this volume contains the backups
+      - type: volume
+        source: backup-data
+        target: /backups
+
+      # the Redmine volume is backed up...
+      - type: volume
+        source: redmine-files
+        target: /redmine-files
+        volume:
+          nocopy: true
+
+    networks:
+      - postgres-net
+
+networks:
+  traefik-net:
+    external: true
+  postgres-net:
+
 volumes:
   # the Redmine Postgres database
   redmine-pg-data:
@@ -60,7 +99,12 @@ volumes:
   redmine-files:
     driver: local  
 
-networks:
-  traefik-net:
-    external: true
-  postgres-net:
+  # all files stored by the backup operation  
+  backup-data:
+    driver: local
+
+configs:
+  dirvish-master-conf:
+    file: $PWD/config/dirvish-master.conf
+  dirvish-redmine-conf:
+    file: $PWD/config/dirvish-redmine.conf
