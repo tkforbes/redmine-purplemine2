@@ -23,3 +23,7 @@ It is acknowleged that docker secrets provide a secure alternative to
 environment variables but the tradeoff for convenience is acceptable for
 this repo given its low-value as a target and the plan for remote daily backups 
 of the data.
+
+When entering the site for the first time, you will prompted to login and then
+to change the default admin password. Next go to Redmine > Administration > 
+Settings > Display and select PurpleMine2 from the list and save the changes.
